@@ -9,10 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# IBNR
-
-Prediction is hard. Especially of the future.
-~ old Danish proverb
+Prediction is hard. Especially of the future.  
+\~ old Danish proverb
 
 It is in the public interest for insurance companies 
 to have sufficient assets to make all claim payments 
@@ -39,19 +37,35 @@ A. Updated claims: as new facts are discovered, claim values tend to rise
 B. Delayed claims: new, as-yet-unknown claims are often filed 
 after the financial statement date
 
-The bulk estimate (A+B) of the shortfall is called the “Incurred But Not Reported” (IBNR) reserve. 
+The estimate of the total shortfall (A+B) is called the 
+“Incurred But Not Reported” (IBNR) reserve. 
 It is the responsibility of the Actuarial Department to estimate IBNR. 
 
 To review, 
-claim liabilities on an insurance company's balance sheet come in two flavors: 
+claim liabilities on an insurance company's balance sheet 
+come in two flavors: 
 claim-level case reserves estimated by claim adjusters and 
 aggregate-level IBNR reserves estimated by actuaries.
 
 Actuaries have many techniques for estimating IBNR. 
-One of the simplest techniques is called the Chain Ladder Method. 
-The purpose of this paper is to investigate the mathematics behind the Chain Ladder Method.
+One of the simplest techniques is called the Loss Development Method.
 
-We start this investigation with claim data as displayed in triangular format
+
+In a nutshell,
+the Loss Development Method multiplies the total current value of 
+a cohort of claims by a factor.
+
+called a "development factor," 
+the product of which is called the "ultimate" value of 
+total Liability for Claims
+
+the Chain Ladder method looks at ratios of
+total claim values as of 
+The purpose of this paper is 
+to investigate the mathematics behind the Chain Ladder Method.
+
+We start this investigation with summarized claim data 
+as displayed in triangular format
 in Schedule P of the U.S. *Annual Statement*.
 
 ## Annual Statement: Schedule P
@@ -64,11 +78,14 @@ is a thick compendium
 of statistics describing all aspects of an insurance company's business:
 from premium to claims to investments and well beyond
 deep into the bowels of an insurance company.
-One of the key aspects monitored in the yellow book is the company's Liability for Claims.
+One of the key aspects monitored in the yellow book is 
+the company's Liability for Claims.
 Not only is the size of that liability important, 
-but changes in that liability are important too because changes can directly impact the 
+but changes in that liability are important too because 
+changes can directly impact the 
 company's bottom line.
-We will see how that works with two tables in **Schedule P** of the yellow book,
+We will see how that works with two tables in 
+**Schedule P** of the yellow book,
 **Part2** and **Part3**.
 
 Changes in that liability are closely scrutinized because they directly 
