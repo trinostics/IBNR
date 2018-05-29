@@ -1,0 +1,127 @@
+---
+title: "IBNR"
+author: "Dan Murphy"
+date: "May 26, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# IBNR
+
+Prediction is hard. Especially of the future.
+~ old Danish proverb
+
+It is in the public interest for insurance companies 
+to have sufficient assets to make all claim payments 
+owed in the future on policies purchased in the past.
+The estimated total future value owed on behalf of policyholders 
+as of any given financial statement date is called the company’s 
+“Liability for Claims” 
+(technically that’s not the NAIC’s word for it, 
+but close enough). 
+Estimating this liability, usually the largest on a company's balance sheet, 
+falls under the purview of two company departments: 
+Claims and Actuarial.
+
+When a policyholder files a claim, 
+it is the responsibility of the Claims Department 
+to estimate the total amount likely to be paid out. 
+These claim-level estimates are called "case reserves." 
+Case reserves reflect the value of a claim from the company’s standpoint. 
+But the total value of case reserves usually falls short of the company’s 
+true Liability for Claims for two reasons:
+
+A. Updated claims: as new facts are discovered, claim values tend to rise
+
+B. Delayed claims: new, as-yet-unknown claims are often filed 
+after the financial statement date
+
+The bulk estimate (A+B) of the shortfall is called the “Incurred But Not Reported” (IBNR) reserve. 
+It is the responsibility of the Actuarial Department to estimate IBNR. 
+
+To review, 
+claim liabilities on an insurance company's balance sheet come in two flavors: 
+claim-level case reserves estimated by claim adjusters and 
+aggregate-level IBNR reserves estimated by actuaries.
+
+Actuaries have many techniques for estimating IBNR. 
+One of the simplest techniques is called the Chain Ladder Method. 
+The purpose of this paper is to investigate the mathematics behind the Chain Ladder Method.
+
+We start this investigation with claim data as displayed in triangular format
+in Schedule P of the U.S. *Annual Statement*.
+
+## Annual Statement: Schedule P
+
+For the benefit of US regulators, 
+as of every December 31st every insurance company must file a 
+set of reports called the *Annual Statement*.
+This report, a.k.a the "Yellow Book," 
+is a thick compendium 
+of statistics describing all aspects of an insurance company's business:
+from premium to claims to investments and well beyond
+deep into the bowels of an insurance company.
+One of the key aspects monitored in the yellow book is the company's Liability for Claims.
+Not only is the size of that liability important, 
+but changes in that liability are important too because changes can directly impact the 
+company's bottom line.
+We will see how that works with two tables in **Schedule P** of the yellow book,
+**Part2** and **Part3**.
+
+Changes in that liability are closely scrutinized because they directly 
+flow through to the bottom line.
+
+year over year directly impact the
+company's net income that year. over time is illuminated from various perspectives. 
+The data that we will poke and prod in this paper is called GenIns.
+
+## GenIns
+
+The ChainLadder package describes GenIns as a
+"run off triangle of accumulated general insurance claims data."
+GenIns is a real, not simulated, cumulative paid loss  was created by the Australian actuary Greg Taylor.
+
+
+egins with its representation in Schedule P - Part 3, meticulously named “Cumulative Paid Net Loss and Defense and Cost Containment Expenses Reported at Year End ($000 omitted)”:
+
+```{r}
+#setwd("C:/Users/Dan/Desktop/GenIns")
+library(ChainLadder)
+library(mondate)
+df <- as.data.frame(GenIns, na.rm = TRUE)
+df$ay <- as.numeric(df$origin) + 2000 # give labels to the origin's
+df$Accident_Year <- as.numeric(df$origin) + 2007 # give labels to the origin's
+df$Evaluation_YearEnd <- df$ay + df$dev - 1
+df[["Evaluation_Date"]] <- mondate.ymd(df$Evaluation_YearEnd)
+tri <- as.triangle(df, origin = "Accident_Year", 
+                   dev = "Evaluation_YearEnd", value = "value")
+tri
+round(tri)
+noquote(format(round(tri), big.mark = ","))
+
+tri2 <- as.triangle(df, origin = "Accident_Year", 
+                    dev = "Evaluation_Date", value = "value")
+tri2
+round(tri2)
+noquote(format(round(tri2/1000), big.mark = ","))
+
+m <- round(tri2/1000)
+names(dimnames(m))[2L] <- "Evaluation_Date ($000 omitted)"
+noquote(format(m, big.mark = ","))
+mf <- format(m, big.mark = ",")
+nams <- names(dimnames(m))
+dimnms <- dimnames(m)
+mfp <- paste("   ", mf)
+dim(mfp) <- dim(mf)
+dimnames(mfp) <- dimnms
+noquote(mfp)
+mfp[is.na(m)] <- "     XXX"
+noquote(mfp)
+
+mfp2 <- rbind(Prior = c("     000", rep("", 9)), mfp)
+print(noquote(mfp2))
+
+```
