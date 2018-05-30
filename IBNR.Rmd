@@ -3,8 +3,8 @@ title: "IBNR"
 author: "Dan Murphy"
 date: "May 26, 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -34,11 +34,12 @@ Case reserves reflect the value of a claim from the company’s standpoint.
 But the total value of case reserves usually falls short of the company’s 
 true Liability for Claims for two reasons:
 
-A. Updated claims: as a claim stays open and new facts are discovered, 
+A. Updated claims: as claims stay open and 
+new facts are discovered, 
 values tend to rise
 
-B. Delayed claims: new, as-yet-unknown claims are often filed 
-after a financial statement date
+B. Delayed claims: new, as-yet-unknown 
+claims are often filed after a financial statement date
 
 The estimate of the total shortfall (A+B) is called the 
 “Incurred But Not Reported” (IBNR) reserve. 
@@ -132,6 +133,8 @@ egins with its representation in Schedule P - Part 3, meticulously named “Cumu
 
 ```{r}
 #setwd("C:/Users/Dan/Desktop/GenIns")
+library(knitr)
+library(kableExtra)
 library(ChainLadder)
 library(mondate)
 df <- as.data.frame(GenIns, na.rm = TRUE)
@@ -166,5 +169,23 @@ noquote(mfp)
 
 mfp2 <- rbind(Prior = c("     000", rep("", 9)), mfp)
 print(noquote(mfp2))
+```
 
+And the kable version:
+
+```{r}
+kable(mfp2, align = 'r') %>% 
+  kable_styling(font_size = 6)
+class(tri2) <- "matrix"
+kable(tri2)
+```
+
+Then plain ol' GenIns by kable:
+```{r}
+G <- GenIns
+class(G) <- "matrix"
+
+kable(G, row.names = TRUE, 
+      format.args = list(big.mark = ','),
+      caption = "GenIns in triangle format")
 ```
