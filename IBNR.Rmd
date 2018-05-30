@@ -2,7 +2,9 @@
 title: "IBNR"
 author: "Dan Murphy"
 date: "May 26, 2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Prediction is hard. Especially of the future.  
-\~ old Danish proverb
+\~ Old Danish Proverb
 
 It is in the public interest for insurance companies 
 to have sufficient assets to make all claim payments 
@@ -32,24 +34,48 @@ Case reserves reflect the value of a claim from the company’s standpoint.
 But the total value of case reserves usually falls short of the company’s 
 true Liability for Claims for two reasons:
 
-A. Updated claims: as new facts are discovered, claim values tend to rise
+A. Updated claims: as a claim stays open and new facts are discovered, 
+values tend to rise
 
 B. Delayed claims: new, as-yet-unknown claims are often filed 
-after the financial statement date
+after a financial statement date
 
 The estimate of the total shortfall (A+B) is called the 
 “Incurred But Not Reported” (IBNR) reserve. 
-It is the responsibility of the Actuarial Department to estimate IBNR. 
+It is the responsibility of the Actuarial Department to estimate IBNR.
 
-To review, 
-claim liabilities on an insurance company's balance sheet 
-come in two flavors: 
-claim-level case reserves estimated by claim adjusters and 
-aggregate-level IBNR reserves estimated by actuaries.
+Most actuarial techniques for estimating IBNR actually 
+estimate the ultimate value of claims first, 
+then subtract paid-to-date to get total reserves,
+and finally subtract case reserves to get IBNR.
 
-Actuaries have many techniques for estimating IBNR. 
+```{r, echo = FALSE}
+plot(c(-3,10), c(-3,10), type = "n", xlab = "", ylab = "", 
+     bty = "n", axes = FALSE)
+rect(0,0,2,5, col = "blue")
+rect(0,5,2,8, col = "green")
+rect(0,8,2,10, col = "yellow")
+text(1, 2.5, "Paid", pos = 3, col = "white")
+text(1, 6.5, "Case\nReserves", col = "black")
+text(1, 9, "IBNR", col = "black")
+library(pBrackets)
+brackets(2, 8, 2, 0, h = NULL, ticks = 5/8, curvature =.2, type = 2,
+         col = 1, lwd = 1, lty = 1, xpd = TRUE)
+text(x=2.5, y=3,"Case Incurred = Paid + Case Reserves", pos = 4)
+brackets(2.5, 10, 2.5, 5, ticks = .4, curvature = .2, type = 2,
+         col = 1, lwd = 1, lty = 1)
+text(x=3, y=8,"Total Reserves = Case Reserves + IBNR", pos = 4)
+brackets(0, 0, 0, 10, ticks = .5, curvature = .2, type = 2,
+         col = 1, lwd = 1, lty = 1, h=1)
+text(x=-1, y=5,"Ultimate", pos = 2)
+
+```
+
+Actuaries have many techniques for estimating the ultimate value of claims,
+and thus IBNR.
 One of the simplest techniques is called the Loss Development Method.
 
+# The Loss Development Method
 
 In a nutshell,
 the Loss Development Method multiplies the total current value of 
