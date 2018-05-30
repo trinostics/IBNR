@@ -131,61 +131,63 @@ GenIns is a real, not simulated, cumulative paid loss  was created by the Austra
 
 egins with its representation in Schedule P - Part 3, meticulously named “Cumulative Paid Net Loss and Defense and Cost Containment Expenses Reported at Year End ($000 omitted)”:
 
-```{r}
+```{r, echo = FALSE}
 #setwd("C:/Users/Dan/Desktop/GenIns")
 library(knitr)
 library(kableExtra)
-library(ChainLadder)
-library(mondate)
+suppressPackageStartupMessages(library(ChainLadder))
+suppressPackageStartupMessages(library(mondate))
 df <- as.data.frame(GenIns, na.rm = TRUE)
-df$ay <- as.numeric(df$origin) + 2000 # give labels to the origin's
 df$Accident_Year <- as.numeric(df$origin) + 2007 # give labels to the origin's
-df$Evaluation_YearEnd <- df$ay + df$dev - 1
+df$Evaluation_YearEnd <- df$Accident_Year + df$dev - 1
 df[["Evaluation_Date"]] <- mondate.ymd(df$Evaluation_YearEnd)
 tri <- as.triangle(df, origin = "Accident_Year", 
                    dev = "Evaluation_YearEnd", value = "value")
-tri
-round(tri)
-noquote(format(round(tri), big.mark = ","))
+#tri
+#round(tri)
+#noquote(format(round(tri / 1000), big.mark = ","))
 
+class(tri) <- "matrix"
+options(knitr.kable.NA = '')
+kable(round(tri / 1000), align = 'r', row.names = TRUE, 
+      format.args = list(big.mark = ','),
+      caption = "GenIns in Sch P part 3 format") %>% 
+  kable_styling(font_size = 8, full_width = FALSE)
+
+###
+## ignore below
+###
 tri2 <- as.triangle(df, origin = "Accident_Year", 
                     dev = "Evaluation_Date", value = "value")
-tri2
-round(tri2)
-noquote(format(round(tri2/1000), big.mark = ","))
+#tri2
+#round(tri2)
+#noquote(format(round(tri2/1000), big.mark = ","))
 
 m <- round(tri2/1000)
 names(dimnames(m))[2L] <- "Evaluation_Date ($000 omitted)"
-noquote(format(m, big.mark = ","))
+#noquote(format(m, big.mark = ","))
 mf <- format(m, big.mark = ",")
 nams <- names(dimnames(m))
 dimnms <- dimnames(m)
 mfp <- paste("   ", mf)
 dim(mfp) <- dim(mf)
 dimnames(mfp) <- dimnms
-noquote(mfp)
+#noquote(mfp)
 mfp[is.na(m)] <- "     XXX"
-noquote(mfp)
+#noquote(mfp)
 
 mfp2 <- rbind(Prior = c("     000", rep("", 9)), mfp)
-print(noquote(mfp2))
-```
-
-And the kable version:
-
-```{r}
-kable(mfp2, align = 'r') %>% 
-  kable_styling(font_size = 6)
-class(tri2) <- "matrix"
-kable(tri2)
+#print(noquote(mfp2))
 ```
 
 Then plain ol' GenIns by kable:
+
 ```{r}
 G <- GenIns
 class(G) <- "matrix"
 
 kable(G, row.names = TRUE, 
       format.args = list(big.mark = ','),
-      caption = "GenIns in triangle format")
+      caption = "GenIns in triangle format")%>% 
+  kable_styling(font_size = 8, full_width = FALSE)
 ```
