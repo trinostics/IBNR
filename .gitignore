@@ -36,5 +36,9 @@ vignettes/*.pdf
 rsconnect/
 .Rproj.user
 
-# Rmarkdown html
+# Rmarkdown html, pdf, doc, docx
 *.html
+*.pdf
+*.doc
+*.docx
+
