@@ -14,34 +14,68 @@ knitr::opts_chunk$set(echo = TRUE)
 Prediction is hard. Especially of the future.  
 \~ Old Danish Proverb
 
-In the Fall of 2016 you cut down some trees that impeded your view
-of a beautiful valley outside the back window of your house.
-Fences are uncommom in your semi-rural area
-and it turns out you cut down your neighbor's trees,
-not your own!
-It took some time,
-but in the Spring of 2017 your neighbor discovered the error
-and filed a lawsuit against you for 
-hundreds of thousands of dollars in lost property value
-and other damages to be determined later. 
-Thank goodness for homeowners insurance!
-You filed a claim with your insurance carrier 
-who took away all your worries about hiring a lawyer,
-defending your case,
-and paying whatever damages are ultimately decided.
+In the Fall of 2016 you cut down some trees 
+along your back property line
+that impeded your view
+of a beautiful valley out the back window of your home.
+Your friends said "Wow"
+Your neighbor complained about his loss of privacy.
+With as much empathy as you could muster you clarify
+"Yes, but they were my trees."
+Your neighbor wasn't so sure and with a bit of
+research through the county records discovered that
+the trees were on his property.
+"Oh, tough break, sorry,"
+you say,
+"honest mistake."
+He demanded restitution.
+You said "Honest mistake."
+He sued you.
 
-Well, almost all your worries ... you start to wonder ...
-"Will my carrier be around to defend me
-and basically see this
-through to the very end,
-whatever that may be?"
-For your sake, Gentle Reader, 
-I certainly hope so.
+Now you find yourself in a lawsuit
+alledging
+hundreds of thousands of dollars in lost property value
+plus other damages to be determined.
+Insurance to the rescue.
+You filed a claim with your insurance carrier
+and they step in to defend you and indemnify you.
+
+,
+Voter Insurance Company,
+and all your problems are solved.
+True to their motto,
+Voter took over.
+
+But later,
+after a few unreturned phone calls 
+you start to wonder about Voter.
+They were the lowest cost company.
+How sound are they? 
+Were you overly swayed by their marketing material?
+Are they stable?
+You didn't do anything on purpose,
+it was an honest mistake.
+Will the judge agree with you?
+What if you end up owing a lot of money?
+
+Will Voter have your back until the very end?
+
+What protections do you have, if any?
+
+http://www.insuranceobserver.com/PDF/2003/071603.pdf
+
+tart with the question,
+does Voter have enough assets to pay
+for all its obligations,
+including your.
 
 It is in every policyholder's interest 
-that their insurance company will stay in business
-long enough to pay all benefits owed its policyholders.
+that their insurance company stay in business
+long enough to pay all benefits owed under contract.
 This is usually a very large number for every insurance company.
+
+588B = 2/3*Industry
+
 The estimated total future value owed on behalf of policyholders 
 as of any given financial statement date is called the company’s 
 *Liability for Claims*[^1]
@@ -88,11 +122,11 @@ so could the value of your claim.
 B. Delayed claims: new, as-yet-unknown 
 claims are often filed after a financial statement date.
 For example,
-as of 12/31/2016 your insurance company did not know
-that your claim had yet to be filed,
-but you paid your 2016 premium so they must have sufficient funds
-as of 12/31/2016 to 
-respond to your claim.
+as of 12/31/2016 Voter Insurance did not know
+that your claim had yet to be filed.
+But you paid your premium so Voter
+must have enough money set aside to respond to your claim,
+whatever the outcome.
 
 ### Actuarial Department
 
@@ -118,15 +152,19 @@ text(0, 9, "IBNR", col = "black")
 library(pBrackets)
 brackets(1, 8, 1, 0, h = NULL, ticks = 5/8, curvature =.2, type = 2,
          col = 1, lwd = 1, lty = 1, xpd = TRUE)
-text(x=1.5, y=3,"Case Incurred = case Paid + Case Reserves", pos = 4)
+text(x=1.5, y=3,"Case Incurred = Claims Paid + Claims Reserves", pos = 4)
 brackets(1.5, 10, 1.5, 5, ticks = .4, curvature = .2, type = 2,
          col = 1, lwd = 1, lty = 1)
-text(x=2, y=8,"Total Reserves = Case Reserves + IBNR", pos = 4)
+text(x=2, y=8,"Total Reserves = Claims Reserves + IBNR", pos = 4)
 brackets(-1, 0, -1, 10, ticks = .5, curvature = .2, type = 2,
          col = 1, lwd = 1, lty = 1, h=1)
 text(x=-2, y=5,"Ultimate", pos = 2)
 
 ```
+
+### Why is IBNR important?
+
+
 
 Actuaries have many techniques for estimating the ultimate value of claims,
 and thus IBNR.
