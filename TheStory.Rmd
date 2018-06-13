@@ -1,0 +1,333 @@
+---
+title: "The Liability for Claims"
+author: "Dan Murphy"
+date: "May 26, 2018"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Prediction is hard. Especially of the future.  
+\~ Old Danish Proverb
+
+In the Fall of 2016 you cut down some trees 
+along your back property line
+that impeded your view
+of the beautiful valley beyond.
+Your friends said "Wow."
+Your neighbor complained about his loss of privacy.
+Empathetically you offered your side:
+"They blocked my view and, in any case, they were my trees."
+Your neighbor wasn't so sure and after
+researching county records discovered
+the trees were on his property.
+"Oh, gee, sorry,"
+you say.
+"Honest mistake."
+He demanded restitution.
+You clarified "Honest mistake!"
+He filed suit.
+
+Now you find yourself facing
+hundreds of thousands of dollars in lost property value,
+aledgedly,
+with additional damages TBD.
+You file a claim with your insurance company
+to engage lawyers,
+defend you, and,
+heaven forbid,
+pay whatever damages are levied against you
+(within certain limits, of course).[^2]
+
+[^2]:http://www.insuranceobserver.com/PDF/2003/071603.pdf
+
+How do you know your insurance company will be around to the bitter end?
+
+It is in every policyholder's interest 
+that their insurance company stay in business
+long enough to pay all benefits owed under contract.
+This is usually a very large number for every insurance company.
+
+588B = 2/3*Industry
+
+The estimated total future value owed on behalf of policyholders 
+as of any given financial statement date is called the company’s 
+*Liability for Claims*[^1]
+and is usually the largest liability on an insurer's balance sheet.
+After estimating those liabilities and other costs,
+the company takes stock of its assets to determine
+if it's bankrupt or still a going concern.
+Estimating the *Liability for Claims* is a very important function
+of an insurance company. 
+This function
+falls under the purview of two key company departments: 
+Claims and Actuarial.
+
+[^1]:The NAIC 
+(National Association of Insurance Commissioners)
+breaks *Liability for Claims* into two categories:
+Losses and Loss Adjustment Expenses
+(costs to defend and manage the claim).
+Liability for Claims is my term for the sum of the two.
+Furthermore, in my opinion the term "loss"
+connotes something detrimental from the policyholder's standpoint,
+whereas those amounts are actually policyholder benefits
+to which they are entitled by virtue of their 
+premium payment every year.
+
+### Claims Department
+
+When a policyholder files a claim, 
+it is the responsibility of the Claims Department 
+to estimate the total amount likely to be paid out. 
+These claim-level estimates are called "claim reserves." 
+A claim reserve reflects the value of that claim 
+from the insurance company’s standpoint. 
+But the total value of claim reserves usually falls short of a company’s 
+true *Liability for Claims* for two reasons:
+
+A. Updated claims: as claims stay open and 
+new facts are discovered, 
+values tend to rise.
+For example,
+if property values in your area increase significantly,
+so could the value of your claim.
+
+B. Delayed claims: new, as-yet-unknown 
+claims are often filed after a financial statement date.
+For example,
+as of 12/31/2016 Voter Insurance did not know
+that your claim had yet to be filed.
+But you paid your premium so Voter
+must have enough money set aside to respond to your claim,
+whatever the outcome.
+
+### Actuarial Department
+
+The estimate of the total shortfall (A+B) is called the 
+“Incurred But Not Reported” (IBNR) reserve. 
+It is the responsibility of the Actuarial Department to estimate IBNR.
+
+Most actuarial techniques for estimating IBNR actually 
+estimate the ultimate value of claims first, 
+then subtract paid-to-date to get total reserves,
+and finally subtract claim reserves to get IBNR.
+Figure 1 below illustrates these concepts.
+
+```{r, echo = FALSE}
+plot(c(-3.5,10), c(-3.5,10), type = "n", xlab = "", ylab = "", 
+     bty = "n", axes = FALSE)
+rect(-1,0,1,5, col = "blue")
+rect(-1,5,1,8, col = "green")
+rect(-1,8,1,10, col = "yellow")
+text(0, 2.5, "Claims\nPaid", pos = 3, col = "white")
+text(0, 6.5, "Claims\nReserves", col = "black")
+text(0, 9, "IBNR", col = "black")
+library(pBrackets)
+brackets(1, 8, 1, 0, h = NULL, ticks = 5/8, curvature =.2, type = 2,
+         col = 1, lwd = 1, lty = 1, xpd = TRUE)
+text(x=1.5, y=3,"Case Incurred = Claims Paid + Claims Reserves", pos = 4)
+brackets(1.5, 10, 1.5, 5, ticks = .4, curvature = .2, type = 2,
+         col = 1, lwd = 1, lty = 1)
+text(x=2, y=8,"Total Reserves = Claims Reserves + IBNR", pos = 4)
+brackets(-1, 0, -1, 10, ticks = .5, curvature = .2, type = 2,
+         col = 1, lwd = 1, lty = 1, h=1)
+text(x=-2, y=5,"Ultimate", pos = 2)
+
+```
+
+### Why is IBNR important?
+
+
+
+Actuaries have many techniques for estimating the ultimate value of claims,
+and thus IBNR.
+One of the simplest techniques is called the Loss Development Method.
+The remainder of this paper will study this method and suggested variants.
+
+### The Claims Development Method
+
+In a nutshell,
+the Claims Development Method multiplies the current
+aggregated value of 
+a cohort of claims by a factor to get the ultimate value 
+for that cohort.
+The factor is called the Claims Development Factor (CDF).
+
+$$ClaimsUltimate_{asof} = ClaimsValue_{asof} * CDF$$
+
+IBNR is the difference between that estimated ultimate value
+and the claims incurred value as of the financial statement date:
+
+$$IBNR_{asof} = ClaimsUltimate_{asof} - ClaimsIncurred_{asof}$$
+
+The substript "asof" is important. 
+It is the date on which all claims values,
+paids and reserves,
+are pulled for entry into the company's financial statements
+and into their actuarial models.[^2]
+
+Since all reserves, claims reserves and IBNR, are estimates,
+any changes in these estimates from one asof date to the next
+will reflect
+positively or negatively on the company's income statement
+over the calendar period between those dates.
+
+[^2]:This is the most succinct situation.
+As you might imagine, 
+accountants have come up with a number of different dates
+that can have bearing on a company's financial statements 
+filed with regulatory authorities.
+We can ignore those complications here.
+
+Let's look at an example.
+
+### Votre Insurance Company
+
+Your carrier,
+Votre Insurance Company,
+has been around since 2011.
+This is what the company had on its financial statements
+as of 12/31/2016:
+
+```{r, echo = FALSE}
+suppressPackageStartupMessages(library(ChainLadder))
+suppressPackageStartupMessages(library(mondate))
+# repeatedly run MCL method on MCL data for smaller and smaller triangles
+row.names(MCLincurred) <- row.names(MCLpaid) <- 2011:2017
+m <- mondate::mondate.ymd(2011:2017)
+
+L <- list()
+
+f <- function(i){
+  M <- MunichChainLadder(MCLpaid[1:i, 1:i], MCLincurred[1:i, 1:i], .1, .1)
+  rptd.diag <- c(getLatestCumulative(MCLincurred[1:i, 1:i]))
+  paid.diag <- c(getLatestCumulative(MCLpaid[1:i, 1:i]))
+  S <- summary(M)$ByOrigin
+  paid.ulti <- S$`Ult. Paid`
+  rptd.ulti <- S$`Ult. Incurred`
+  pmean <- function(u, v) {apply(cbind(u, v), 1, mean)}
+  ulti <- pmean(paid.ulti, rptd.ulti)
+  ulti <- structure(
+    sapply(seq_along(ulti), function(i) {
+      if (ulti[i] <= rptd.diag[i]) ulti[i] <- max(paid.ulti[i], rptd.ulti[i], rptd.diag[i])
+      ulti[i]}),
+    names = names(rptd.diag)
+  )
+  cbind(paid.diag = paid.diag, rptd.diag = rptd.diag,
+        case.diag = rptd.diag - paid.diag,
+        ulti = ulti,
+               paid.ulti = paid.ulti, rptd.ulti = rptd.ulti,
+               ibnr = ulti - paid.diag,
+        `Liability for Claims` = ulti - paid.diag)
+  }
+for (i in 7:3) L[[i]] <- f(i)
+d <- round(L[[6]][,c("paid.diag", "case.diag", 
+                     "ibnr", "Liability for Claims", "ulti")])
+rbind(d, total = colSums(d))
+```
+
+We start this investigation with summarized claim data 
+as displayed in triangular format
+in Schedule P of the U.S. *Annual Statement*.
+
+## Annual Statement: Schedule P
+
+For the benefit of US regulators, 
+as of every December 31st every insurance company must file a 
+set of reports called the *Annual Statement*.
+This report, a.k.a the "Yellow Book," 
+is a thick compendium 
+of statistics describing all aspects of an insurance company's business:
+from premium to claims to investments and well beyond
+deep into the bowels of an insurance company.
+One of the key aspects monitored in the yellow book is 
+the company's Liability for Claims.
+Not only is the size of that liability important, 
+but changes in that liability are important too because 
+changes can directly impact the 
+company's bottom line.
+We will see how that works with two tables in 
+**Schedule P** of the yellow book,
+**Part2** and **Part3**.
+
+Changes in that liability are closely scrutinized because they directly 
+flow through to the bottom line.
+
+year over year directly impact the
+company's net income that year. over time is illuminated from various perspectives. 
+The data that we will poke and prod in this paper is called GenIns.
+
+## GenIns
+
+The ChainLadder package describes GenIns as a
+"run off triangle of accumulated general insurance claims data."
+GenIns is a real, not simulated, cumulative paid loss  was created by the Australian actuary Greg Taylor.
+
+
+egins with its representation in Schedule P - Part 3, meticulously named “Cumulative Paid Net Loss and Defense and Cost Containment Expenses Reported at Year End ($000 omitted)”:
+
+```{r, echo = FALSE}
+#setwd("C:/Users/Dan/Desktop/GenIns")
+library(knitr)
+library(kableExtra)
+suppressPackageStartupMessages(library(ChainLadder))
+suppressPackageStartupMessages(library(mondate))
+df <- as.data.frame(GenIns, na.rm = TRUE)
+df$Accident_Year <- as.numeric(df$origin) + 2007 # give labels to the origin's
+df$Evaluation_YearEnd <- df$Accident_Year + df$dev - 1
+df[["Evaluation_Date"]] <- mondate.ymd(df$Evaluation_YearEnd)
+tri <- as.triangle(df, origin = "Accident_Year", 
+                   dev = "Evaluation_YearEnd", value = "value")
+#tri
+#round(tri)
+#noquote(format(round(tri / 1000), big.mark = ","))
+
+class(tri) <- "matrix"
+options(knitr.kable.NA = '')
+kable(round(tri / 1000), align = 'r', row.names = TRUE, 
+      format.args = list(big.mark = ','),
+      caption = "GenIns in Sch P part 3 format") %>% 
+  kable_styling(font_size = 8, full_width = FALSE)
+
+###
+## ignore below
+###
+tri2 <- as.triangle(df, origin = "Accident_Year", 
+                    dev = "Evaluation_Date", value = "value")
+#tri2
+#round(tri2)
+#noquote(format(round(tri2/1000), big.mark = ","))
+
+m <- round(tri2/1000)
+names(dimnames(m))[2L] <- "Evaluation_Date ($000 omitted)"
+#noquote(format(m, big.mark = ","))
+mf <- format(m, big.mark = ",")
+nams <- names(dimnames(m))
+dimnms <- dimnames(m)
+mfp <- paste("   ", mf)
+dim(mfp) <- dim(mf)
+dimnames(mfp) <- dimnms
+#noquote(mfp)
+mfp[is.na(m)] <- "     XXX"
+#noquote(mfp)
+
+mfp2 <- rbind(Prior = c("     000", rep("", 9)), mfp)
+#print(noquote(mfp2))
+```
+
+Then plain ol' GenIns by kable:
+
+```{r}
+G <- GenIns
+class(G) <- "matrix"
+
+kable(G, row.names = TRUE, 
+      format.args = list(big.mark = ','),
+      caption = "GenIns in triangle format")%>% 
+  kable_styling(font_size = 8, full_width = FALSE)
+```
