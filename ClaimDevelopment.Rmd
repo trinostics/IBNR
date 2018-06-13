@@ -3,8 +3,8 @@ title: "The Liability for Claims"
 author: "Dan Murphy"
 date: "May 26, 2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -14,67 +14,47 @@ knitr::opts_chunk$set(echo = TRUE)
 Prediction is hard. Especially of the future.  
 \~ Old Danish Proverb
 
-In the Fall of 2016 you cut down some trees 
-along your back property line
-that impeded your view
-of a beautiful valley out the back window of your home.
-Your friends said "Wow"
-Your neighbor complained about his loss of privacy.
-With as much empathy as you could muster you clarify
-"Yes, but they were my trees."
-Your neighbor wasn't so sure and with a bit of
-research through the county records discovered that
-the trees were on his property.
-"Oh, tough break, sorry,"
-you say,
-"honest mistake."
-He demanded restitution.
-You said "Honest mistake."
-He sued you.
-
-Now you find yourself in a lawsuit
-alledging
-hundreds of thousands of dollars in lost property value
-plus other damages to be determined.
-Insurance to the rescue.
-You filed a claim with your insurance carrier
-and they step in to defend you and indemnify you.
-
-,
-Voter Insurance Company,
-and all your problems are solved.
-True to their motto,
-Voter took over.
-
-But later,
-after a few unreturned phone calls 
-you start to wonder about Voter.
-They were the lowest cost company.
-How sound are they? 
-Were you overly swayed by their marketing material?
-Are they stable?
-You didn't do anything on purpose,
-it was an honest mistake.
-Will the judge agree with you?
-What if you end up owing a lot of money?
-
-Will Voter have your back until the very end?
-
-What protections do you have, if any?
-
-http://www.insuranceobserver.com/PDF/2003/071603.pdf
-
-tart with the question,
-does Voter have enough assets to pay
-for all its obligations,
-including your.
-
-It is in every policyholder's interest 
-that their insurance company stay in business
+It is in the policyholder's interest 
+that the insurance company stays in business
 long enough to pay all benefits owed under contract.
 This is usually a very large number for every insurance company.
 
-588B = 2/3*Industry
+Aon Benfield study:
+carried P&C reserves @ 12/31/2013 = 575.8B[^3]
+
+[^3]:http://thoughtleadership.aonbenfield.com/Documents/20140604_ab_analytics_industry_reserves_study_2013.pdf 
+Brian Alvers
+Head of Americas Actuarial
+Aon Benfield Analytics
++1.312.381.5355
+brian.alvers@aonbenfield.com
+Stephen Mildenhall
+Global Chief Executive Officer of Analytics
+Aon Analytics and Innovation Center, Singapore
++65 6872 7668
+stephen.mildenhall@aonbenfield.com
+Greg Heerde
+Head of Americas
+Aon Benfield Analytics
++1.312.381.5364
+greg.heerde@aonbenfield.com
+
+The industry’s surplus grew 7.4 percent and
+reached a new all-time-high value of $752.5
+billion as of December 31, 2017.
+In 2017, earned premiums grew 3.3 percent to
+$540.6 billion.
+Net written premiums climbed $24.2 billion
+to $552.6 billion in 2017 from $528.3 billion in
+2016. 
+Surplus (Consolidated) 2017 $752,508M,
+Loss & Loss Adjustment Expense Reserves 2017 $619,225M[^4]
+
+[^4]:https://www.verisk.com/siteassets/media/downloads/insuranceresultsreport2017q4.pdf.
+See also http://www.naic.org/prod_serv/STA-PS-17.pdf
+
+In 2017, earned premiums grew 3.3 percent to
+$540.6 billion
 
 The estimated total future value owed on behalf of policyholders 
 as of any given financial statement date is called the company’s 
