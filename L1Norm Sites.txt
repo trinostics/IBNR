@@ -1,0 +1,6 @@
+Least Absolute Deviations (LAD) regression, which is also sometimes called Robust Regression
+http://www.johnmyleswhite.com/notebook/2013/03/22/using-norms-to-understand-linear-regression/
+
+"Although uptake of robust methods has been slow, modern mainstream statistics text books often include discussion of these methods (for example, the books by Seber and Lee, and by Faraway; for a good general description of how the various robust regression methods developed from one another see Andersen's book). Also, modern statistical software packages such as R, Statsmodels, Stata and S-PLUS include considerable functionality for robust estimation (see, for example, the books by Venables and Ripley, and by Maronna et al.)."
+https://en.wikipedia.org/wiki/Robust_regression
+
