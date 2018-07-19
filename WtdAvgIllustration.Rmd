@@ -20,8 +20,8 @@ equal to twice the square root of $x$.
 ```{r}
 # WtdAvgIllustration
 set.seed(12345)
-(x <- 100 + rnorm(16, 0, 50))
-(y <- 2*x + rnorm(16, 0, sqrt(x)*2))
+(x <- round(100 + rnorm(16, 0, 50), 2))
+(y <- round(2*x + rnorm(16, 0, sqrt(x)*2), 2))
 ```
 From the plot of $y$ versus $x$, the linear relationship appears tightly
 distributed around the regression line.
@@ -121,39 +121,22 @@ a spread of  $\pm `r round(totr/yhat * 100, 0)`\%$ --
 almost a third of the time.
 
 This is the sense in which the Mack/Murphy method estimates
-the reserve risk from this slim $x/y$ triangle
+the reserve risk.
+From this slim $x/y$ "triangle"
 
 ```{r, echo = FALSE}
 tri <- round(rbind(cbind(x,y), c(90, NA)), 2)
 rownames(tri) <- 1:17
 colnames(tri) <- 12*1:2
-```
-
-```{r}
-print(length(x))
-print(length(y))
-```
-```{r, echo = FALSE}
 library(knitr)
 library(kableExtra)
 options(knitr.kable.NA = '')
 kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
 ```
 
-```{r, echo = FALSE}
-yhatx <- x * a
-parrx <- x * sigma_a
-prorx <- round(sqrt(x) * sigma, 3)
-totrx <- sqrt(parrx^2 + prorx^2)
-plot(x, y, ylim=c(0, round(max(y)*1.2, -floor(log10(max(y))))), 
-     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x))))))
-lines(x, yhatx)
-points(90, a*90, col = "red", pch = 15)
-lines(x[order(x)], (yhatx + parrx)[order(x)], lty = "dashed")
-lines(x[order(x)], (yhatx - parrx)[order(x)], lty = "dashed")
-lines(x[order(x)], (yhatx + totrx)[order(x)], lty = "dotted", col = "red")
-lines(x[order(x)], (yhatx - totrx)[order(x)], lty = "dotted", col = "red")
-```
+we get the following output
+using the R ChainLadder package:
+
 ```{r, echo = FALSE}
 M <- suppressWarnings(ChainLadder:::MackChainLadder(
   tri, mse.method = "Independence"))
@@ -183,6 +166,26 @@ compare <- data.frame(x = 90,
 #print(compare)
 ```
 
+The prediction with uncertainty is illustrated
+graphically in Figure xxx below:
+```{r, echo = FALSE}
+yhatx <- x * a
+parrx <- x * sigma_a
+prorx <- round(sqrt(x) * sigma, 3)
+totrx <- sqrt(parrx^2 + prorx^2)
+plot(x, y, ylim=c(0, round(max(y)*1.2, -floor(log10(max(y))))), 
+     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x))))))
+lines(x, yhatx)
+points(90, a*90, col = "red", pch = 15)
+axis(1, at = 90, col.ticks = "red", col.axis = "red")
+lines(x[order(x)], (yhatx + parrx)[order(x)], lty = "dashed")
+lines(x[order(x)], (yhatx - parrx)[order(x)], lty = "dashed")
+lines(x[order(x)], (yhatx + totrx)[order(x)], lty = "dotted", col = "red")
+lines(x[order(x)], (yhatx - totrx)[order(x)], lty = "dotted", col = "red")
+```
+
+What mathematics results with a larger triangle?
+
 ## Let's add another column
 
 Suppose we have subsequent observations of 
@@ -191,11 +194,10 @@ Let's simulate 12 values of $z$ at age 36 months that are,
 on average,
 110% of the value of $y$ plus an error term 
 with mean zero and standard deviation
-equal to 150% the square root of $x$.
+equal to 150% the square root of $y$.
 
 ```{r}
-z <- 1.1*y[1:12] + rnorm(12, 0, sqrt(y[1:12])*1.5)
-
+z <- round(1.1*y[1:12] + rnorm(12, 0, sqrt(y[1:12])*1.5), 2)
 ```
 From the plot of $z$ versus $y$, the linear relationship appears tightly
 distributed around the regression line.
@@ -207,11 +209,37 @@ plot(y, z, ylim=c(0, 1.2*round(max(z), -floor(log10(max(z))))),
 l <- lm(z ~ y + 0)
 lines(y[order(y)], predict(l, newdata = data.frame(y = y))[order(y)])
 y <- ysave
+scatterplot3d::scatterplot3d(x,y,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
+scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
+scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), zlab = "z", type = "h")
+plot(x, y-x)
+plot(y[1:12], z-y[1:12])
+#rgl::plot3d(x,y,c(z, rep(NA,4)))
 ```
 
 The weighted average 24-36 month development factor
 rounded to three decimal places is
-`r (A2 <- round(sum(z)/sum(y[1:12]), 3))`.
+`r (A2 <- round(sum(z)/sum(y[1:12]), 3))`,
+not far from the theoretical value 1.5.
+
+The projection of the last four values of $y$ to age 36 
+as estimated from the augmented triangle
+```{r}
+trisave <- tri
+kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
+tri <- cbind(tri,
+             `36` = c(z, rep(NA, 5)))
+kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
+```
+with 
+risk statistics as outlined above can be found in the Mack/Murphy
+output in lines 13 - 16 below:
+```{r}
+M <- ChainLadder::MackChainLadder(
+  tri, mse.method = "Independence", est.sigma = "Mack")
+print(M)
+tri <- trisave
+```
 
 # How do the prediction statistics change with aggregated data? 
 
