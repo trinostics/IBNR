@@ -7,44 +7,58 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+eko <- FALSE
 ```
 
 Suppose we have 16 observations of $x$ at age 12 months 
 with values randomly distributed around 100.
-Now simulate 16 values of $y$ at age 24 months that are, 
+```{r, echo = eko}
+# WtdAvgIllustration
+set.seed(12345)
+x <- round(100 + rnorm(16, 0, 50), 2)
+hist(x)
+```
+
+Now simulate values of $y$ at age 24 months that are, 
 on average,
 twice the value of $x$ plus an error term 
 with mean zero and standard deviation
 equal to twice the square root of $x$.
 
 ```{r}
-# WtdAvgIllustration
-set.seed(12345)
-(x <- round(100 + rnorm(16, 0, 50), 2))
-(y <- round(2*x + rnorm(16, 0, sqrt(x)*2), 2))
+y <- round(2 * x + rnorm(16, 0, sqrt(x) * 2), 2) # rounded
 ```
-From the plot of $y$ versus $x$, the linear relationship appears tightly
-distributed around the regression line.
-```{r}
+```{r, echo = eko}
+#print(eko)
 plot(x,y, ylim=c(0, round(max(y)*1.2, -floor(log10(max(y))))), 
      xlim=c(0, round(max(x)*1.2, -floor(log10(max(x))))))
 l <- lm(y~x+0)
 lines(x[order(x)], predict(l, newdata = data.frame(x = x))[order(x)])
 ```
 
+From the plot of $y$ versus $x$, the linear relationship is tightly
+distributed around the regression line.
+
 The weighted average 12-24 month development factor
 rounded to three decimal places is
-`r (A <- round(sum(y)/sum(x), 3))`.
+$\sum_{i=1}^{16}y / \sum_{i=1}^{16}x =$
+$\sum_{i=1}^{16}y \div \sum_{i=1}^{16}x =$
+$\frac{\sum_{i=1}^{16}y}{\sum_{i=1}^{16}x} =$
+`r (A <- round(sum(y)/sum(x), 3))`,
+very close to the theoretical value.
 
 Let's see how that average link ratio can be the
 solution of a simple linear regression model.
 
+## Linear regression
+
 Currently, $x$ and $y$ are related according to the equation
 $$y = ax + \sqrt{x}e$$
-where the standard deviation of $e$ is $\sigma = 2$.
+where the standard deviation 
+$\sigma$ of $e$ is 2.
 But since the complete error term $\sqrt{x}e$ involves $x$,
 this model
-violates the simple linear regression assumption
+violates the simple linear regression requirement
 that the error term is independent of the regressor.
 No worries -- easily resolved:
 simply divide both $x$ and $y$ by the square root of $x$.
@@ -52,9 +66,9 @@ $$x'=x / \sqrt{x}$$
 $$y' = y / \sqrt{x}$$
 Then $x'$ and $y'$ are related according to the equation
 $$y'=ax'+e$$
-which is a simple linear regression equation without an intercept.
+which is a simple linear regression model without an intercept.
 In R, the value of the slope coefficient $a$ 
-is estimated with the `lm` function
+is estimated with the `lm` ("linear model") function
 (the "+0" in the formula forces a zero intercept):
 ```{r}
 xp <- x / sqrt(x)
@@ -62,12 +76,16 @@ yp <- y / sqrt(x)
 L <- lm(yp ~ xp + 0)
 ```
 
+In excel ...
+
 The `summary` function reveals a ton of information
 about this regression model
 as well as our original model.
-```{r}
+```{r, echo = eko}
 sL <- summary(L)
-print(sL)
+```
+```{r, echo = TRUE}
+print(summary(L))
 ```
 
 Here we see
@@ -97,28 +115,58 @@ The risk that we are wrong under our model
 $$y = ax + \sqrt{x}e$$
 arises from an inacurate estimate of the parameter $a$ 
 ("parameter risk")
-and from the innate risk embodied by the error term
+and from the residual risk embodied by the error term
 ("process risk").
-Using the rule
-$$ std(c \cdot x) = c \cdot std(x)$$
-for constant $c$, the parameter risk of the projection is
-$$ 90 \cdot \sigma_a = `r (parr <- 90*sigma_a)`$$
+
+### Trick #1
+
+$$ std(a \cdot c) = std(a) \cdot = \sigma_a \cdot c$$
+
+#### Parameter risk
+
+In the triangle $(x,y)$ the values of $y$
+are considered random variables 
+*conditional on the given values of $x$* and
+the values of $x$ are considered "constants".
+So the estimated link ratio $a$
+is considered a random variable
+and the the new value $x=90$
+is considered a constant.
+
+
+Using Trick 1 with $a=`r a`$ and $c=90$
+the parameter risk of the projection 
+$$ `r a` \cdot 90$$
+
+is
+$$ \sigma_a \cdot 90 = (`r sigma_a`)(90) = `r (parr <- 90*sigma_a)`$$
 and the process risk is
-$$ \sqrt{90} \times \sigma = `r (pror <- round(sqrt(90) * sigma, 3))`$$
+$$ \sqrt{90} \times \sigma = `r (pror <- round(sqrt(90) * sigma, 3))`.$$
+
 The total risk ("standard error of the projection")
 uses the pythagorean theorem
 $$ TotalRisk = \sqrt{ParameterRisk^2 + ProcessRisk ^2}$$
 So
 $$TotalRisk = \sqrt{`r parr`^2 + `r pror`^2} = `r (totr <- round(sqrt(parr^2 + pror^2),1))`.$$
 
+(Footnote: the conditional probability
+theory justifying these
+results is highly technical,
+but that's the jist of the argument)
+
 In other words,
 don't be surprised if the projection $y = `r yhat`$ 
 from the new value of $x = 90$
 based on the weighted average development factor `r a` is less than 
 `r round(yhat - totr, 0)` or 
-greater than `r round(yhat + totr, 0)` --
-a spread of  $\pm `r round(totr/yhat * 100, 0)`\%$ --
+greater than `r round(yhat + totr, 0)`
 almost a third of the time.
+That's a 
+spread of about $\pm `r round(totr/yhat * 100, 0)`\%$
+of the projected ("ultimate") value
+or about 
+$\pm `r round(totr/(yhat - 90) * 100, 1)`\%$
+of the incremental change ("IBNR").
 
 This is the sense in which the Mack/Murphy method estimates
 the reserve risk.
@@ -142,14 +190,14 @@ M <- suppressWarnings(ChainLadder:::MackChainLadder(
   tri, mse.method = "Independence"))
 print(M)
 sM <- summary(M)
-print(names(M))
-print(class(tail(M$Mack.ParameterRisk, 1)))
-print(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
-                           ncol(M$Mack.ParameterRisk)])
-print(M$Mack.ProcessRisk[nrow(M$Mack.ProcessRisk),
-                         ncol(M$Mack.ProcessRisk)])
-print(M$Mack.S.E[nrow(M$Mack.S.E),
-                 ncol(M$Mack.S.E)])
+#print(names(M))
+#print(class(tail(M$Mack.ParameterRisk, 1)))
+#print(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
+#                           ncol(M$Mack.ParameterRisk)])
+#print(M$Mack.ProcessRisk[nrow(M$Mack.ProcessRisk),
+#                         ncol(M$Mack.ProcessRisk)])
+#print(M$Mack.S.E[nrow(M$Mack.S.E),
+#                 ncol(M$Mack.S.E)])
 # Create a table to hold the statistics
 compare <- data.frame(x = 90,
                       y = a * 90,
@@ -184,7 +232,11 @@ lines(x[order(x)], (yhatx + totrx)[order(x)], lty = "dotted", col = "red")
 lines(x[order(x)], (yhatx - totrx)[order(x)], lty = "dotted", col = "red")
 ```
 
-What mathematics results with a larger triangle?
+Question:
+Why should the prediction error for the 
+new observation $x=90$ be considered understated?
+
+What happens when we have a larger triangle?
 
 ## Let's add another column
 
@@ -196,12 +248,8 @@ on average,
 with mean zero and standard deviation
 equal to 150% the square root of $y$.
 
-```{r}
+```{r, echo = FALSE}
 z <- round(1.1*y[1:12] + rnorm(12, 0, sqrt(y[1:12])*1.5), 2)
-```
-From the plot of $z$ versus $y$, the linear relationship appears tightly
-distributed around the regression line.
-```{r}
 ysave <- y
 y <- y[1:12]
 plot(y, z, ylim=c(0, 1.2*round(max(z), -floor(log10(max(z))))), 
@@ -216,6 +264,9 @@ plot(x, y-x)
 plot(y[1:12], z-y[1:12])
 #rgl::plot3d(x,y,c(z, rep(NA,4)))
 ```
+
+From the plot of $z$ versus $y$, the linear relationship appears tightly
+distributed around the regression line.
 
 The weighted average 24-36 month development factor
 rounded to three decimal places is
@@ -239,6 +290,7 @@ M <- ChainLadder::MackChainLadder(
   tri, mse.method = "Independence", est.sigma = "Mack")
 print(M)
 tri <- trisave
+print(M$)
 ```
 
 # How do the prediction statistics change with aggregated data? 
