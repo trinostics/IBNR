@@ -1,0 +1,9 @@
+Twenty-five years ago Mack (“Distribution Free”) and Murphy (“Unbiased LDFs”) published algorithms for estimating the uncertainty of chainladder projections. With few exceptions (e.g., Bardis/Majidi/Murphy "CLFM") not much development in that area has occurred since. Perhaps it is because AI is a much more exciting area in which to practice.  
+
+This session will reintroduce the Mack/Murphy model for the purpose of attendees achieving the following three objectives:
+
+* Visualize the advantages and disadvantages of chainladder
+
+* Appreciate what happens when the model is applied to detailed data
+
+* Investigate alternative approaches

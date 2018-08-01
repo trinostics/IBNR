@@ -36,38 +36,41 @@ l <- lm(y~x+0)
 lines(x[order(x)], predict(l, newdata = data.frame(x = x))[order(x)])
 ```
 
-From the plot of $y$ versus $x$, the linear relationship is tightly
-distributed around the regression line.
-
 The weighted average 12-24 month development factor
-rounded to three decimal places is
-$\sum_{i=1}^{16}y / \sum_{i=1}^{16}x =$
-$\sum_{i=1}^{16}y \div \sum_{i=1}^{16}x =$
-$\frac{\sum_{i=1}^{16}y}{\sum_{i=1}^{16}x} =$
-`r (A <- round(sum(y)/sum(x), 3))`,
-very close to the theoretical value.
+$\sum y / \sum x =`r (A <- round(sum(y)/sum(x), 3))`$,
+is very close to the theoretical value.
+```{r, echo = FALSE}
+# $\sum_{i=1}^{16}y / \sum_{i=1}^{16}x =$
+# $\sum_{i=1}^{16}y \div \sum_{i=1}^{16}x =$
+# $\frac{\sum_{i=1}^{16}y}{\sum_{i=1}^{16}x} =$
+```
 
-Let's see how that average link ratio can be the
-solution of a simple linear regression model.
+Let's see
+if we can find a model whose solution is consistent with 
+that weighted average link ratio.
 
 ## Linear regression
 
-Currently, $x$ and $y$ are related according to the equation
-$$y = ax + \sqrt{x}e$$
+We know
+$x$ and $y$ are related according to the equation
+$$y = bx + \sqrt{x}e$$
 where the standard deviation 
 $\sigma$ of $e$ is 2.
-But since the complete error term $\sqrt{x}e$ involves $x$,
-this model
+But this model
 violates the simple linear regression requirement
-that the error term is independent of the regressor.
+that the error term --
+here $\sqrt{x}e$ --
+be independent of the regressor.
 No worries -- easily resolved:
 simply divide both $x$ and $y$ by the square root of $x$.
 $$x'=x / \sqrt{x}$$
 $$y' = y / \sqrt{x}$$
-Then $x'$ and $y'$ are related according to the equation
-$$y'=ax'+e$$
-which is a simple linear regression model without an intercept.
-In R, the value of the slope coefficient $b$ 
+Then $x'$ and $y'$ are related by the equation
+$$y'=bx'+e$$
+a simple linear regression model without an intercept.
+
+Using R, 
+the value of the slope coefficient $b$ 
 is estimated with the `lm` ("linear model") function
 (the "+0" in the formula forces a zero intercept):
 ```{r}
@@ -76,11 +79,10 @@ yp <- y / sqrt(x)
 L <- lm(yp ~ xp + 0)
 ```
 
-In excel ...
+(In excel use the LINEST function.)
 
-The `summary` function reveals a ton of information
-about this regression model
-as well as our original model.
+The `summary` function reveals a lot of useful information
+about the estimated parameters of this $(x',y')$ model.
 ```{r, echo = eko}
 sL <- summary(L)
 ```
@@ -94,71 +96,82 @@ Here we see
 `r (b <- round(sL$coefficient[1],3))` of the coefficient $b$
 ("`Estimate`")
 coincides with our weighted average development factor
-2. an estimate of the standard deviation $\sigma_b$ of 
-that estimated factor ("`Std. Error`") is 
-`r (sigma_b <- round(sL$coefficient[2], 5))`, and
-3. an estimate of the standard deviation $\sigma$ of the error term $e$ 
-(the "`Residual standard error`")
+2. a measure of the uncertainty of that estimate 
+("`Std. Error`") is $\hat{\sigma_b} =
+\hat{`r (sigma_b <- round(sL$coefficient[2], 5))`}$,
+and
+3. a measure of the uncertainty of the error term $e$
+("`Residual standard error`")
 is
-`r (sigma <- round(sL$sigma, 3))`.
+$\hat{\sigma} = \hat{`r (sigma <- round(sL$sigma, 3))`}$.
 
 This is very useful information!
 In particular, 
 it can tell us the prediction risk of the 
-projection $y$ from a new value of $x$.
+projection $\hat{y}$ from a new value of $x$.
 
 For example, 
-if $x=90$ is a newly observed 12-month value,
-then the projection
-of $y$ is simply $$90*`r A` = `r (yhat <- round(90*b, 0))`$$
-The risk that we are wrong under our model
-$$y = ax + \sqrt{x}e$$
-arises from an inacurate estimate of the parameter $b$ 
-("parameter risk")
-and from the residual risk embodied by the error term
-("process risk").
+if $x=90$ is the observed 12-month value of a new 17^th^ accident year,
+then the projection to age 24 is 
+$$\hat{`r b`} \cdot 90 = \hat{`r (yhat <- round(90*b, 0))`}$$
+The risk that our estimate misses the eventual modeled value
 
-### Trick #1
+$$y = b \cdot 90 + \sqrt{90}e$$
 
-$$ std(b \cdot c) = std(b) \cdot = \sigma_b \cdot c$$
+is measured by the meas square error:
 
-#### Parameter risk
+$$
+mse(\hat{'r yhat'}) = E((\hat{'r yhat'}-y_{17}))
+$$
 
-In the triangle $(x,y)$ the values of $y$
-are considered random variables 
-*conditional on the given values of $x$* and
-the values of $x$ are considered "constants".
-So the estimated link ratio $b$
-is considered a random variable
-and the the new value $x=90$
-is considered a constant.
+subtracting both sides of the two equations above:
 
-Using Trick 1 with $b=`r b`$ and $c=90$
-the parameter risk of the projection 
-$$ `r b` \cdot 90$$
+$$y - \hat{`r yhat`} = (b \cdot 90 + \sqrt{90}e) - (90 \cdot \hat{`r b`})  
+= 90 (b - \hat{`r b`}) + \sqrt{90}e$$
 
-is
-$$ \sigma_b \cdot 90 = (`r sigma_b`)(90) = `r (parr <- 90*sigma_b)`$$
-and the process risk is
-$$ \sqrt{90} \times \sigma = `r (pror <- round(sqrt(90) * sigma, 3))`.$$
+The uncertainties embodied by the two terms are called
+"Parameter Risk" ($\Delta$) and "Process Risk" ($\Gamma$)
+and are commonly measured by the "standard error" metric.
 
-The total risk ("standard error of the projection")
-uses the pythagorean theorem
-$$ TotalRisk = \sqrt{ParameterRisk^2 + ProcessRisk ^2}$$
-So
-$$TotalRisk = \sqrt{`r parr`^2 + `r pror`^2} = `r (totr <- round(sqrt(parr^2 + pror^2),1))`.$$
+------------
+
+### Rule 1  
+For constant $c$ and random variate $u$
+$$se(c \cdot u) = c \cdot se(u)$$
+
+------------
+
+Using Rule 1,
+standard error estimates of those risks can be calculated 
+from the `lm` output above:
+
+* Parameter risk: 
+
+$$ \hat{\Delta} = 90 \cdot \hat{se}(90 (b - \hat{`r b`})) =   
+90 \cdot \hat{\sigma_b} =   
+90 \cdot \hat{`r sigma_b`} = 
+\hat{`r (parr <- 90*sigma_b)`}$$
+
+* Process Risk:
+
+$$ \hat{\Gamma} = \sqrt{90} \cdot \hat{se}(e) = \sqrt{90} \cdot \hat{\sigma} = \sqrt{90} \cdot \hat{`r sigma`} = \hat{`r (pror <- round(sqrt(90) * sigma, 3))`}$$
+
+* Total Risk ("standard error of the projection")
+comes via the Pythagorean Theorem:
+$$\hat{TotalRisk} = \sqrt{\hat{\Delta}^2 + \hat{\Gamma}^2} =
+\sqrt{\hat{`r parr`}^2 + \hat{`r pror`}^2} = 
+\hat{`r (totr <- round(sqrt(parr^2 + pror^2),1))`}.$$
 
 (Footnote: the conditional probability
-theory justifying these
-results is highly technical,
-but that's the jist of the argument)
+theory underlying these
+results is highly technical.
+See Ali Majidi's work in a "Family of Chain Ladder Models",
+*Variance*.)
 
-In other words,
-don't be surprised if the projection $y = `r yhat`$ 
-from the new value of $x = 90$
-based on the weighted average development factor `r b` is less than 
-`r round(yhat - totr, 0)` or 
-greater than `r round(yhat + totr, 0)`
+What this means is that you should not 
+be surprised if the eventual value of $y$
+is greater than `r yhat` + `r totr`
+or less than `r yhat` - `r totr`
 almost a third of the time.
 That's a 
 spread of about $\pm `r round(totr/yhat * 100, 0)`\%$
@@ -167,8 +180,9 @@ or about
 $\pm `r round(totr/(yhat - 90) * 100, 1)`\%$
 of the incremental change ("IBNR").
 
-This is the sense in which the Mack/Murphy method estimates
-the reserve risk.
+This is the sense in which the Mack/Murphy method 
+measures chainladder reserve risk.
+
 From this slim $x/y$ "triangle"
 
 ```{r, echo = FALSE}
@@ -182,7 +196,7 @@ kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
 ```
 
 we get the following output
-using the R ChainLadder package:
+from the `MakChainLadder` function in the R ChainLadder package:
 
 ```{r, echo = FALSE}
 M <- suppressWarnings(ChainLadder:::MackChainLadder(
@@ -231,21 +245,26 @@ lines(x[order(x)], (yhatx + totrx)[order(x)], lty = "dotted", col = "red")
 lines(x[order(x)], (yhatx - totrx)[order(x)], lty = "dotted", col = "red")
 ```
 
+```
 Question:
-Why should the prediction error for the 
-new observation $x=90$ be considered understated?
+Why should the prediction error for the new observation x=90 be considered understated?
+```
 
 What happens when we have a larger triangle?
 
 ## Let's add another column
 
 Suppose we have subsequent observations of 
-the first 12 data points.
-Let's simulate 12 values of $z$ at age 36 months that are, 
+$z$ at age 36 months that are, 
 on average,
 110% of the value of $y$ plus an error term 
 with mean zero and standard deviation
 equal to 150% the square root of $y$.
+
+$$z = b_y \cdot y + \sqrt{y} \cdot e_y$$
+where $b_y = 1.1$ and $\sigma_{e_y}=1.5$
+
+Let's simulate the first 12 data points.
 
 ```{r, echo = FALSE}
 z <- round(1.1*y[1:12] + rnorm(12, 0, sqrt(y[1:12])*1.5), 2)
@@ -256,40 +275,136 @@ plot(y, z, ylim=c(0, 1.2*round(max(z), -floor(log10(max(z))))),
 l <- lm(z ~ y + 0)
 lines(y[order(y)], predict(l, newdata = data.frame(y = y))[order(y)])
 y <- ysave
-scatterplot3d::scatterplot3d(x,y,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
-scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
-scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), zlab = "z", type = "h")
-plot(x, y-x)
-plot(y[1:12], z-y[1:12])
+#scatterplot3d::scatterplot3d(x,y,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
+#scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
+#scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), zlab = "z", type = "h")
+#plot(x, y-x)
+#plot(y[1:12], z-y[1:12])
 #rgl::plot3d(x,y,c(z, rep(NA,4)))
 ```
 
-From the plot of $z$ versus $y$, the linear relationship appears tightly
-distributed around the regression line.
-
 The weighted average 24-36 month development factor
 rounded to three decimal places is
-`r (A2 <- round(sum(z)/sum(y[1:12]), 3))`,
-not far from the theoretical value 1.5.
+`r (b_y <- round(sum(z)/sum(y[1:12]), 3))` --
+close to the theoretical value 1.1
+but not as close as our estimate of $b = b_x$ above.
 
-The projection of the last four values of $y$ to age 36 
-is estimated from this slightly less-slim triangle
+Using the same approach as above,
+but this time for $y` = y / \sqrt{y}$ and 
+$z` = z / sqrt{y}$
+the three key statistics estimates are
+
 ```{r}
+ysave <- y
+y <- y[1:12]
+yp <- y / sqrt(y)
+zp <- z / sqrt(y)
+l24 <- lm(zp ~ yp + 0)
+sl24 <- summary(l24)
+b_y <- round(sl24$coefficient[1],3)
+sigma_b24 <- round(sl24$coefficient[2], 5)
+sigma24 <- round(sl24$sigma, 3)
+print(b_y)
+print(sigma_b24)
+print(sigma24)
+y <- ysave
+```
+
+
+1. $\hat{b_y} = \hat{`r b_y`}$
+2. $\hat{\sigma_{b_y}} = \hat{`r sigma_b24`}$,
+and
+3. $\hat{\sigma_{e_y}} = \hat{`r sigma24`}$.
+
+The projection of the last four values of $y$ 
+and the value of $x$ to age 36 
+is developed from this less-slim triangle
+
+```{r, echo = eko}
 trisave <- tri
-kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
 tri <- cbind(tri,
              `36` = c(z, rep(NA, 5)))
 kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
 ```
-with 
+
+The 
 risk statistics as outlined above can be found in the Mack/Murphy
 output in lines 13 - 16 below:
+
 ```{r}
 M <- ChainLadder::MackChainLadder(
   tri, mse.method = "Independence", est.sigma = "Mack")
 print(M)
 tri <- trisave
 ```
+
+We've already seen how Rule 1 drives the risk statistics for $y_{13} - y_{16}$
+developed to the next age.
+Does that also work for developing the age 24 estimate of $x_{17}$
+to its next age?
+After all,
+isn't it true that
+
+$$\hat{1.145} \cdot \hat{183} = \hat{209.9}?$$
+
+The answer is "No" because Rule 1 assumes the estimated age-to-age factor
+is multiplying a **constant** value
+but the 17^th^ accident year's multiplicand
+is an **estimate** $\hat{183}$.
+
+### Parameter risk
+
+------------
+
+### Rule 2:  
+For random variates $u$ and $v$ 
+$$ var(u \cdot v) = E^2(u) \cdot var(v) + E^2(v) \cdot var(u) + var(u) \cdot var(v) $$
+
+------------
+
+Using Rule 2,
+the standard error measure of the uncertainty of the product of the two estimates
+$\hat{183}$ and $\hat{1.145}$ is
+
+$$ \sqrt{\hat{1.145}^2 \cdot se^2(\hat{183}) + \hat{183}^2 \cdot se^2(\hat{1.145}) +
+se^2(\hat{1.145}) \cdot se^2(\hat{183})}
+$$
+$$ 
+\sqrt{1.145^2 \cdot 5.0328^2 + 183^2 \cdot .04101^2 + .04101^2 \cdot 5.0528^2}
+$$
+$$
+= \sqrt{`r 1.145^2` \cdot `r 5.0328^2` + `r 183^2` \cdot `r .04101^2`
++ .04101^2 \cdot 5.0528^2}
+$$
+$$ = \sqrt{\hat{1.311} \cdot \hat{`r parr^2`} + 
+`r sprintf("%.0f", 183^2)` \cdot `r round(sigma_b24^2,5)` + 
+`r round(sigma_b24^2,5)` \cdot \hat{`r parr^2`}}$$
+
+$$ = \sqrt{
+`r 1.145^2*parr^2 + 183^2*sigma_b24^2 + sigma_b24^2*parr^2`
+}$$
+$$ =`r sqrt(1.145^2*parr^2 + 183^2*sigma_b24^2 + sigma_b24^2*parr^2)`$$
+
+### Process risk
+
+------------
+
+### Rule 3:  
+For random variates $u$ and $v$, and $w$ 
+$$ var(u) = E_v(var(u|v)) +  var_v(E(u|v)) $$
+
+------------
+
+Using Rule 3,
+the standard error measure of the uncertainty of the
+error term comprising the product
+$\sqrt{\hat{y}} \cdot e_y$ is
+
+$$ var(\sqrt{y} \cdot e_y) = 
+E_x(var(\sqrt{y} \cdot e_y|x) + var_x(E(\sqrt{y} \cdot e_y|x)) =
+$$
+$$E_x(y \cdot var(e_y|x)) + var_x()
+$$
 
 # How do the prediction statistics change with aggregated data? 
 

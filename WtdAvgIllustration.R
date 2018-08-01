@@ -1,187 +1,44 @@
----
-title: "WtdAvgIllustration"
-author: "Dan Murphy"
-date: "July 11, 2018"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-eko <- FALSE
-```
-
-Suppose we have 16 observations of $x$ at age 12 months 
-with values randomly distributed around 100.
-```{r, echo = eko}
-# WtdAvgIllustration
+NC <- 16
 set.seed(12345)
-x <- round(100 + rnorm(16, 0, 50), 2)
+x <- round(100 + rnorm(NC, 0, 50), 2)
+ndx <- which(x <= 0)
+while (n <- length(ndx)) {
+  x[ndx] <- round(100 + rnorm(n, 0, 50), 2)
+  ndx <- which(x <= 0)
+}
 hist(x)
-```
+y <- round(2 * x + rnorm(NC, 0, sqrt(x) * 2), 2) # rounded
+ndx <- which(y <= 0)
+while (n <- length(ndx)) {
+  y[ndx] <- round(2 * x[ndx] + rnorm(n, 0, sqrt(x[ndx]) * 2), 2)
+  ndx <- which(y <= 0)
+}
+hist(y)
 
-Now simulate values of $y$ at age 24 months that are, 
-on average,
-twice the value of $x$ plus an error term 
-with mean zero and standard deviation
-equal to twice the square root of $x$.
-
-```{r}
-y <- round(2 * x + rnorm(16, 0, sqrt(x) * 2), 2) # rounded
-```
-```{r, echo = eko}
-#print(eko)
 plot(x,y, ylim=c(0, round(max(y)*1.2, -floor(log10(max(y))))), 
-     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x))))))
+     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x)))))
+     , main = "24- vs. 12-Month Data\nWith Expected Value Line")
 l <- lm(y~x+0)
+b <- coef(l)[1]
 lines(x[order(x)], predict(l, newdata = data.frame(x = x))[order(x)])
-```
-
-From the plot of $y$ versus $x$, the linear relationship is tightly
-distributed around the regression line.
-
-The weighted average 12-24 month development factor
-rounded to three decimal places is
-$\sum_{i=1}^{16}y / \sum_{i=1}^{16}x =$
-$\sum_{i=1}^{16}y \div \sum_{i=1}^{16}x =$
-$\frac{\sum_{i=1}^{16}y}{\sum_{i=1}^{16}x} =$
-`r (A <- round(sum(y)/sum(x), 3))`,
-very close to the theoretical value.
-
-Let's see how that average link ratio can be the
-solution of a simple linear regression model.
-
-## Linear regression
-
-Currently, $x$ and $y$ are related according to the equation
-$$y = ax + \sqrt{x}e$$
-where the standard deviation 
-$\sigma$ of $e$ is 2.
-But since the complete error term $\sqrt{x}e$ involves $x$,
-this model
-violates the simple linear regression requirement
-that the error term is independent of the regressor.
-No worries -- easily resolved:
-simply divide both $x$ and $y$ by the square root of $x$.
-$$x'=x / \sqrt{x}$$
-$$y' = y / \sqrt{x}$$
-Then $x'$ and $y'$ are related according to the equation
-$$y'=ax'+e$$
-which is a simple linear regression model without an intercept.
-In R, the value of the slope coefficient $a$ 
-is estimated with the `lm` ("linear model") function
-(the "+0" in the formula forces a zero intercept):
-```{r}
 xp <- x / sqrt(x)
 yp <- y / sqrt(x)
 L <- lm(yp ~ xp + 0)
-```
-
-In excel ...
-
-The `summary` function reveals a ton of information
-about this regression model
-as well as our original model.
-```{r, echo = eko}
 sL <- summary(L)
-```
-```{r, echo = TRUE}
-print(summary(L))
-```
-
-Here we see
-
-1.  the estimate 
-`r (a <- round(sL$coefficient[1],3))` of the coefficient $a$
-("`Estimate`")
-coincides with our weighted average development factor
-2. an estimate of the standard deviation $\sigma_a$ of 
-that estimated factor ("`Std. Error`") is 
-`r (sigma_a <- round(sL$coefficient[2], 5))`, and
-3. an estimate of the standard deviation $\sigma$ of the error term $e$ 
-(the "`Residual standard error`")
-is
-`r (sigma <- round(sL$sigma, 3))`.
-
-This is very useful information!
-In particular, 
-it can tell us the prediction risk of the 
-projection $y$ from a new value of $x$.
-
-For example, 
-if $x=90$ is a newly observed 12-month value,
-then the projection
-of $y$ is simply $$90*`r A` = `r (yhat <- round(90*a, 0))`$$
-The risk that we are wrong under our model
-$$y = ax + \sqrt{x}e$$
-arises from an inacurate estimate of the parameter $a$ 
-("parameter risk")
-and from the residual risk embodied by the error term
-("process risk").
-Using the rule
-$$ std(c \cdot x) = c \cdot std(x)$$
-for constant $c$, the parameter risk of the projection is
-$$ 90 \cdot \sigma_a = `r (parr <- 90*sigma_a)`$$
-and the process risk is
-$$ \sqrt{90} \times \sigma = `r (pror <- round(sqrt(90) * sigma, 3))`.$$
-(footnote: the conditional probability
-theory justifying these
-equations is highly technical,
-that that's the jist of the argument)
-
-The total risk ("standard error of the projection")
-uses the pythagorean theorem
-$$ TotalRisk = \sqrt{ParameterRisk^2 + ProcessRisk ^2}$$
-So
-$$TotalRisk = \sqrt{`r parr`^2 + `r pror`^2} = `r (totr <- round(sqrt(parr^2 + pror^2),1))`.$$
-
-In other words,
-don't be surprised if the projection $y = `r yhat`$ 
-from the new value of $x = 90$
-based on the weighted average development factor `r a` is less than 
-`r round(yhat - totr, 0)` or 
-greater than `r round(yhat + totr, 0)`
-almost a third of the time.
-That's a 
-spread of about $\pm `r round(totr/yhat * 100, 0)`\%$
-of the projected ("ultimate") value
-or about 
-$\pm `r round(totr/(yhat - 90) * 100, 1)`\%$
-of the incremental change ("IBNR").
-
-This is the sense in which the Mack/Murphy method estimates
-the reserve risk.
-From this slim $x/y$ "triangle"
-
-```{r, echo = FALSE}
+b <- round(sL$coefficient[1],3)
+sigma_b <- round(sL$coefficient[2], 5)
+sigma <- round(sL$sigma, 3)
 tri <- round(rbind(cbind(x,y), c(90, NA)), 2)
-rownames(tri) <- 1:17
+rownames(tri) <- 1:(NC+1)
 colnames(tri) <- 12*1:2
-library(knitr)
-library(kableExtra)
-options(knitr.kable.NA = '')
-kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
-```
-
-we get the following output
-using the R ChainLadder package:
-
-```{r, echo = FALSE}
+#tri
 M <- suppressWarnings(ChainLadder:::MackChainLadder(
   tri, mse.method = "Independence"))
-print(M)
+#print(M)
 sM <- summary(M)
-#print(names(M))
-#print(class(tail(M$Mack.ParameterRisk, 1)))
-#print(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
-#                           ncol(M$Mack.ParameterRisk)])
-#print(M$Mack.ProcessRisk[nrow(M$Mack.ProcessRisk),
-#                         ncol(M$Mack.ProcessRisk)])
-#print(M$Mack.S.E[nrow(M$Mack.S.E),
-#                 ncol(M$Mack.S.E)])
-# Create a table to hold the statistics
 compare <- data.frame(x = 90,
-                      y = a * 90,
-                      a = a,
+                      y = b * 90,
+                      b = b,
                       sigma = round(M$sigma, 2),
   ParameterRisk = round(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
                            ncol(M$Mack.ParameterRisk)], 2),
@@ -190,184 +47,74 @@ compare <- data.frame(x = 90,
   TotalRisk = round(M$Mack.S.E[nrow(M$Mack.S.E),
                  ncol(M$Mack.S.E)], 2),
   meanx = round(mean(x), 2),
-  row.names = "17")
+  row.names = NC+1)
 #print(compare)
-```
-
-The prediction with uncertainty is illustrated
-graphically in Figure xxx below:
-```{r, echo = FALSE}
-yhatx <- x * a
-parrx <- x * sigma_a
+yhatx <- x * b
+parrx <- x * sigma_b
 prorx <- round(sqrt(x) * sigma, 3)
 totrx <- sqrt(parrx^2 + prorx^2)
 plot(x, y, ylim=c(0, round(max(y)*1.2, -floor(log10(max(y))))), 
-     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x))))))
+     xlim=c(0, round(max(x)*1.2, -floor(log10(max(x)))))
+, main = "24- vs. 12-Month Data\nWith 1 se Prediction Bands")
 lines(x, yhatx)
-points(90, a*90, col = "red", pch = 15)
+points(90, b*90, col = "red", pch = 15)
 axis(1, at = 90, col.ticks = "red", col.axis = "red")
 lines(x[order(x)], (yhatx + parrx)[order(x)], lty = "dashed")
 lines(x[order(x)], (yhatx - parrx)[order(x)], lty = "dashed")
 lines(x[order(x)], (yhatx + totrx)[order(x)], lty = "dotted", col = "red")
 lines(x[order(x)], (yhatx - totrx)[order(x)], lty = "dotted", col = "red")
-```
 
-Question:
-Why should the prediction error for the 
-new observation $x=90$ be considered understated?
-
-What happens when we have a larger triangle?
-
-## Let's add another column
-
-Suppose we have subsequent observations of 
-the first 12 data points.
-Let's simulate 12 values of $z$ at age 36 months that are, 
-on average,
-110% of the value of $y$ plus an error term 
-with mean zero and standard deviation
-equal to 150% the square root of $y$.
-
-```{r, echo = FALSE}
-z <- round(1.1*y[1:12] + rnorm(12, 0, sqrt(y[1:12])*1.5), 2)
+z <- round(1.1*y[1:(NC*3/4)] + rnorm(12, 0, sqrt(y[1:(NC*3/4)])*1.5), 2)
+ndx <- which(z <= 0)
+while (n <- length(ndx)) {
+  z[ndx] <- round(1.1*y[1:(NC*3/4)][ndx] + rnorm(n, 0, sqrt(y[1:(NC*3/4)][ndx])*1.5), 2)
+  ndx <- which(z <= 0)
+}
+hist(z)
 ysave <- y
-y <- y[1:12]
+y <- y[1:(NC*3/4)]
 plot(y, z, ylim=c(0, 1.2*round(max(z), -floor(log10(max(z))))), 
-     xlim=c(0, 1.2*round(max(y), -floor(log10(max(y))))))
+     xlim=c(0, 1.2*round(max(y), -floor(log10(max(y)))))
+, main = "36- vs. 24-Month Data\nWith Expected Value Line")
 l <- lm(z ~ y + 0)
 lines(y[order(y)], predict(l, newdata = data.frame(y = y))[order(y)])
 y <- ysave
-scatterplot3d::scatterplot3d(x,y,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
-scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), box=F, zlab = "z", angle = 55)
-scatterplot3d::scatterplot3d(y,x,c(z, rep(NA,4)), zlab = "z", type = "h")
-plot(x, y-x)
-plot(y[1:12], z-y[1:12])
-#rgl::plot3d(x,y,c(z, rep(NA,4)))
-```
+(A2 <- round(sum(z)/sum(y[1:(NC*3/4)]), 3))
+#not far from the theoretical value 1.5.
 
-From the plot of $z$ versus $y$, the linear relationship appears tightly
-distributed around the regression line.
-
-The weighted average 24-36 month development factor
-rounded to three decimal places is
-`r (A2 <- round(sum(z)/sum(y[1:12]), 3))`,
-not far from the theoretical value 1.5.
-
-The projection of the last four values of $y$ to age 36 
-as estimated from the augmented triangle
-```{r}
 trisave <- tri
-kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
+#tri
 tri <- cbind(tri,
-             `36` = c(z, rep(NA, 5)))
-kable_styling(kable(tri, row.names = TRUE), full_width = FALSE)
-```
-with 
-risk statistics as outlined above can be found in the Mack/Murphy
-output in lines 13 - 16 below:
-```{r}
+             `36` = c(z, rep(NA, NC/4+1)))
+#tri
 M <- ChainLadder::MackChainLadder(
   tri, mse.method = "Independence", est.sigma = "Mack")
-print(M)
+#print(M)
+print(M$Total.ParameterRisk)
+print(M$Total.ProcessRisk)
 tri <- trisave
-```
+#Let's add up the x's and y's into accident year totals.
+#Here is the aggregated data.
+dat <- data.frame(ay = c(rep(1:4, each = NC/4), 5)
+                  , claimno=1:(NC+1)
+                  , x = c(x, 90)
+                  , y = c(y, NA)
+                  , z = c(z, rep(NA, NC/4+1))
+                  )
+#dat
+A <- aggregate(dat[c("x", "y", "z")], by = dat["ay"], FUN = sum)
+A <- A[, 2:4]
+#A
+MA <- ChainLadder::MackChainLadder(A, mse.method = "Independence", est.sigma = "Mack")
+#print(MA)
+print(M$Total.ParameterRisk)
+print(M$Total.ProcessRisk)
+print(MA$Total.ParameterRisk)
+print(MA$Total.ProcessRisk)
 
-# How do the prediction statistics change with aggregated data? 
 
-Let's add up the x's and y's into accident year totals.
-Here is the aggregated data.
+  cbind(
+    M$Total.ParameterRisk,M$Total.ProcessRisk,MA$Total.ParameterRisk,MA$Total.ProcessRisk
+  )
 
-```{r}
-dat <- data.frame(claimno=1:16,x=x,y=y,ay=4*(1:4))
-A <- aggregate(dat[c("x", "y")], by = dat["ay"], FUN = sum)
-kable_styling(kable(A, row.names = TRUE), full_width = FALSE)
-```
 
-Here is the plot of the now four data points.
-
-```{r}
-X <- A$x
-Y <- A$y
-plot(X, Y, ylim=c(0, 1.2*round(max(Y), -floor(log10(max(Y))))), 
-     xlim=c(0, 1.2*round(max(X), -floor(log10(max(X))))))
-L <- lm(Y ~ X)
-lines(X[order(X)], predict(L, newdata = data.frame(X = X))[order(X)])
-#abline(lm(Y ~ X))
-```
-
-Interestingly, the weighted average development factor is the same
-whether you use aggregated data or the detailed data.
-
-```{r}
-sum(Y) / sum(X) # same 
-```
-
-which is to say the projection of the
-new value of $x$, 90, will be the same. 
-But what happens to the parameter risk,
-process risk, and total risk?
-
-```{r}
-TRI <- round(rbind(cbind(X, Y), c(90, NA)), 2)
-rownames(TRI) <- 1:nrow(TRI)
-colnames(TRI) <- 12*1:ncol(TRI)
-
-M <- suppressWarnings(ChainLadder:::MackChainLadder(
-  TRI, mse.method = "Independence"))
-print(M)
-#print(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
-#                           ncol(M$Mack.ParameterRisk)])
-#print(M$Mack.ProcessRisk[nrow(M$Mack.ProcessRisk),
-#                         ncol(M$Mack.ProcessRisk)])
-#print(M$Mack.S.E[nrow(M$Mack.S.E),
-#                 ncol(M$Mack.S.E)])
-compare <- rbind(compare, 
-                 data.frame(x = 90,
-                      y = a * 90,
-                      a = a,
-    sigma = round(M$sigma, 2),
-  ParameterRisk = round(M$Mack.ParameterRisk[nrow(M$Mack.ParameterRisk),
-                           ncol(M$Mack.ParameterRisk)], 2),
-  ProcessRisk = round(M$Mack.ProcessRisk[nrow(M$Mack.ProcessRisk),
-                         ncol(M$Mack.ProcessRisk)], 2),
-  TotalRisk = round(M$Mack.S.E[nrow(M$Mack.S.E),
-                 ncol(M$Mack.S.E)], 2),
-  meanx = round(mean(X), 2))
-)
-row.names(compare) <- c("det", "agg")
-#row.names(compare) <- c("17", "5")
-print(compare)
-```
-
-It is interesting to note that the ratios of the three risk
-statistics are approximately equal to the ratio of the
-estimated $\sigma's$.
-Coincidental?!?
-
-```{r}
-compare[1, 3:6] / compare[2, 3:6]
-```
-```{r, echo = FALSE}
-yhatx <- X * a
-parrx <- X * sigma_a
-prorx <- round(sqrt(X) * sigma, 3)
-totrx <- sqrt(parrx^2 + prorx^2)
-plot(X, Y, ylim=c(0, 1.2*round(max(Y), -floor(log10(max(Y))))), 
-     xlim=c(0, 1.2*round(max(X), -floor(log10(max(X))))))
-lines(X, yhatx)
-points(90, a*90, col = "red", pch = 15)
-lines(X[order(X)], (yhatx + parrx)[order(X)], lty = "dashed")
-lines(X[order(X)], (yhatx - parrx)[order(X)], lty = "dashed")
-lines(X[order(X)], (yhatx + totrx)[order(X)], lty = "dotted", col = "red")
-lines(X[order(X)], (yhatx - totrx)[order(X)], lty = "dotted", col = "red")
-```
-```{r, echo = FALSE}
-M <- suppressWarnings(ChainLadder:::MackChainLadder(
-  tri, mse.method = "Independence"))
-print(M)
-sM <- summary(M)
-print(names(M))
-print(M$Mack.ParameterRisk)
-print(M$Mack.ProcessRisk)
-print(M$Mack.S.E)
-```
