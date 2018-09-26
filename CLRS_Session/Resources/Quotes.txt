@@ -1,0 +1,7 @@
+Bayesian analysis of compound loss distributions 
+Jeffrey S. Pai 
+Warren Centre for Actuarial Studies & Research, University of Manitoba, Winnipeo. Manitoba R3 T 5 V4, Canada 
+Received I October 1995; received in revised form 1 July 1996
+Jpournal of Econometrics, 79 (1997) 129-146
+
+"Classical actuarial mathematics was based on deterministic approaches. How- ever, uncertainty is a fundamental characteristic of the insurance business. The number and severity of claims often appear to vary in a random manner. The study of the stochastic features of insurance business is needed to support clas- sical deterministic techniques. "

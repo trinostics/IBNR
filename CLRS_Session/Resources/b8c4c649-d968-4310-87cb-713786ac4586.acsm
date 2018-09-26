@@ -1,0 +1,26 @@
+<fulfillmentToken fulfillmentType="buy" auth="user" xmlns="http://ns.adobe.com/adept">
+  <distributor>urn:uuid:2eebee13-acc4-4de7-8b30-3e6495399007</distributor>
+  <operatorURL>http://fulfillment.copyright.com/fulfillment</operatorURL>
+  <transaction>b8c4c649-d968-4310-87cb-713786ac4586</transaction>
+  <expiration>2018-08-26T18:12:02-04:00</expiration>
+  <resourceItemInfo>
+    <resource>urn:uuid:b8c4c649-d968-4310-87cb-713786ac4586</resource>
+    <resourceItem>0</resourceItem>
+    <metadata>
+      <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">On the estimation of long tailed skewed distributions with actuarial applications</dc:title>
+      <dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/"></dc:creator>
+      <dc:publisher xmlns:dc="http://purl.org/dc/elements/1.1/">Elsevier</dc:publisher>
+      <dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">application/pdf</dc:format>
+    </metadata>
+    <licenseToken>
+      <resource>urn:uuid:b8c4c649-d968-4310-87cb-713786ac4586</resource>
+      <permissions>
+        <display/>
+        <excerpt/>
+        <print/>
+        <play/>
+      </permissions>
+    </licenseToken>
+  </resourceItemInfo>
+  <hmac>vxxzC1aMTM9UCmWkxbXUwudKlY0=</hmac>
+</fulfillmentToken>

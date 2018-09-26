@@ -2,7 +2,7 @@ plotMackIBNR <- function(x, ...) {
   xlab <- deparse(substitute(x))
   titl <- paste0("MackChainLadder(", xlab, ") IBNR Distribution")
   M <- MackChainLadder(x, ...)
-  source("../summaryMackChainLadder.r")
+  source("summaryMackChainLadder.r")
   S <- smcl(M)
   source("c:/Utilities/lognormal.r")
   mu <- S["sum", "IBNR"]

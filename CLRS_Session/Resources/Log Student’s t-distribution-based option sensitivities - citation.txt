@@ -1,0 +1,2 @@
+Daniel T. Cassidy, Michael J. Hamp & Rachid Ouyed (2013) Log Student’s t-distribution-based option sensitivities: Greeks for the Gosset formulae, Quantitative Finance, 13:8, 1289-1302, DOI: 10.1080/14697688.2012.744087
+
