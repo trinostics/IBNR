@@ -38,7 +38,6 @@ rsconnect/
 
 # Rmarkdown html, pdf, doc, docx
 *.html
-*.pdf
 *.doc
 *.docx
 
