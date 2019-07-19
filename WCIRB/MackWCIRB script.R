@@ -11,6 +11,7 @@ summary(M)$Totals
 writeToExcel(summary(M)$ByOrigin, "MackWCIRB.xlsx")
 writeToExcel(summary(M)$Totals, "MackWCIRB.xlsx")
 
+source(file.path("..", "summaryMackChainLadder.R"))
 S <- summaryMackChainLadder(M)
 S
 writeToExcel(S, "MackWCIRB.xlsx")
