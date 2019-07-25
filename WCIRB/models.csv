@@ -1,0 +1,13 @@
+modelname,ymetric,xmetric,xlag,modelformula,link_ratio_class,actuarial_method_name,xname_for_predict,tailfunbody
+ind_itdpaid,ind_itdpaid,ind_itdpaid,1,ind_itdpaid~ind_itdpaid.1-1,link_ratio_itd,chain,ind_itdpaid,tail_unity(link)
+ind_itdrptd,ind_itdrptd,ind_itdrptd,1,ind_itdrptd~ind_itdrptd.1-1,link_ratio_itd,chain,ind_itdrptd,tail_unity(link)
+ind_case,ind_case,ind_case,1,ind_case~ind_case.1-1,link_ratio_itd,chain,ind_case,tail_zero(link)
+ind_casepaid,ind_cypd,ind_case,1,ind_cypd~ind_case.1-1,link_ratio_incryx,casepaid,ind_case,tail_unity(link)
+med_itdpaid,med_itdpaid,med_itdpaid,1,med_itdpaid~med_itdpaid.1-1,link_ratio_itd,chain,med_itdpaid,tail_unity(link)
+med_itdrptd,med_itdrptd,med_itdrptd,1,med_itdrptd~med_itdrptd.1-1,link_ratio_itd,chain,med_itdrptd,tail_unity(link)
+med_case,med_case,med_case,1,med_case~med_case.1-1,link_ratio_itd,chain,med_case,tail_zero(link)
+med_casepaid,med_cypd,med_case,1,med_cypd~med_case.1-1,link_ratio_incryx,casepaid,med_case,tail_unity(link)
+loss_itdpaid,loss_itdpaid,loss_itdpaid,1,loss_itdpaid~loss_itdpaid.1-1,link_ratio_itd,chain,loss_itdpaid,tail_unity(link)
+loss_itdrptd,loss_itdrptd,loss_itdrptd,1,loss_itdrptd~loss_itdrptd.1-1,link_ratio_itd,chain,loss_itdrptd,tail_unity(link)
+loss_case,loss_case,loss_case,1,loss_case~loss_case.1-1,link_ratio_itd,chain,loss_case,tail_zero(link)
+loss_casepaid,loss_cypd,loss_case,1,loss_cypd~loss_case.1-1,link_ratio_incryx,casepaid,loss_case,tail_unity(link)
